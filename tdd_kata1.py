@@ -2,7 +2,7 @@ import re
 import unittest
 
 
-class StringCalculator:
+class StringCalculatorInputParser(object):
     def __init__(self):
         pass
 
@@ -41,7 +41,7 @@ class StringCalculator:
             commands = commands[index + 1:]
 
         if delimiters_query is not None:
-            delimiters_query = StringCalculator.parse_delimiters(delimiters_query)
+            delimiters_query = StringCalculatorInputParser.parse_delimiters(delimiters_query)
 
         if delimiters_query is None:
             delimiters_query = default_delimiters
@@ -55,7 +55,7 @@ class StringCalculator:
         :param commands: string with delimiters and tasks
         :return: yields values for processing
         """
-        possible_separators, data = StringCalculator.get_tasks(commands)
+        possible_separators, data = StringCalculatorInputParser.get_tasks(commands)
         items = [data]
 
         for separator in possible_separators:
@@ -69,6 +69,11 @@ class StringCalculator:
         for item in items:
             yield item
 
+
+class StringCalculator:
+    def __init__(self):
+        pass
+
     @staticmethod
     def Add(commands):
         """
@@ -80,7 +85,7 @@ class StringCalculator:
 
         wrong_numbers = []
 
-        for v in StringCalculator.parse_input(commands):
+        for v in StringCalculatorInputParser.parse_input(commands):
             v = str(v).strip()
             if not len(v):
                 continue
@@ -103,14 +108,53 @@ class StringCalculator:
         return res
 
 
+class TestStringParser(unittest.TestCase):
+    def _combine_yield_into_array(self, iterator):
+        res = []
+        for v in iterator:
+            res.append(v)
+
+        return res
+
+    def test_simple_issues(self):
+        values = self._combine_yield_into_array(StringCalculatorInputParser.parse_input("1,2"))
+        self.assertEqual(["1", "2"], values)
+
+    def test_crlf_in_command(self):
+        values = self._combine_yield_into_array(StringCalculatorInputParser.parse_input("1\n2,3"))
+        self.assertEqual(["1", "2", "3"], values)
+
+    def test_crlf_and_non_std_separator(self):
+        values = self._combine_yield_into_array(StringCalculatorInputParser.parse_input("//;\n1;2;4;6"))
+        self.assertEqual(["1", "2", "4", "6"], values)
+
+    def test_negative_values_parsing(self):
+        values = self._combine_yield_into_array(StringCalculatorInputParser.parse_input("//;\n1;2;4;6;-10;-1005;1006;300"))
+        self.assertEqual(["1", "2", "4", "6", "-10", "-1005", "1006", "300"], values)
+
+    def test_long_separators(self):
+        values = self._combine_yield_into_array(StringCalculatorInputParser.parse_input("//[***]\n1***2***3"))
+        self.assertEqual(["1", "2", "3"], values)
+
+    def test_multuple_separators_support(self):
+        values = self._combine_yield_into_array(StringCalculatorInputParser.parse_input("//[*][%]\n1*2%3"))
+        self.assertEqual(["1", "2", "3"], values)
+
+    def test_multuple_long_separators_support(self):
+        values = self._combine_yield_into_array(StringCalculatorInputParser.parse_input("//[&&*][%%@]\n1&&*2%%@3"))
+        self.assertEqual(["1", "2", "3"], values)
+
+
 class TestStringCalculator(unittest.TestCase):
-    def test_simple_tests(self):
+    def test_empty_string(self):
         v = StringCalculator.Add("")
         self.assertEqual(v, 0)
 
+    def test_one_value_sum(self):
         v = StringCalculator.Add("1")
         self.assertEqual(v, 1)
 
+    def test_simple_input(self):
         v = StringCalculator.Add("1,2")
         self.assertEqual(v, 3)
 
