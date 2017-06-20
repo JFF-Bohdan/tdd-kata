@@ -1,5 +1,6 @@
 import re
 import unittest
+from unittest.mock import patch
 
 
 class StringCalculatorInputParser(object):
@@ -146,71 +147,68 @@ class TestStringParser(unittest.TestCase):
 
 
 class TestStringCalculator(unittest.TestCase):
+
+    def _mocky_ret(self):
+        return patch("__main__.StringCalculatorInputParser")
+
     def test_empty_string(self):
-        v = StringCalculator.Add("")
-        self.assertEqual(v, 0)
+        with self._mocky_ret() as mc:
+            mc.parse_input.return_value = []
+            self.assertEqual(StringCalculator.Add(""), 0)
 
     def test_one_value_sum(self):
-        v = StringCalculator.Add("1")
-        self.assertEqual(v, 1)
+        with self._mocky_ret() as mc:
+            mc.parse_input.return_value = [1]
+            self.assertEqual(StringCalculator.Add("1"), 1)
 
     def test_simple_input(self):
-        v = StringCalculator.Add("1,2")
-        self.assertEqual(v, 3)
+        with self._mocky_ret() as mc:
+            mc.parse_input.return_value = [1, 2]
+            self.assertEqual(StringCalculator.Add("1,2"), 3)
 
     def test_unknown_amount_of_numbers(self):
-        v = StringCalculator.Add("1,2, 3, 4   ")
-        self.assertEqual(v, 10)
-
-    def test_crlf_separator_support(self):
-        v = StringCalculator.Add("1\n2, 3")
-        self.assertEqual(v, 6)
-
-    def test_support_different_delimiters(self):
-        v = StringCalculator.Add("//;\n1;2")
-        self.assertEqual(v, 3)
+        with self._mocky_ret() as mc:
+            mc.parse_input.return_value = [1, 2, 3, 4]
+            self.assertEqual(StringCalculator.Add("1,2, 3, 4   "), 10)
 
     def test_exceptions_for_negative_number(self):
-        self.assertRaises(Exception, StringCalculator.Add, "//;\n1;2;-3")
+        with self._mocky_ret() as mc:
+            mc.parse_input.return_value = [1, 2, -3]
 
-        with self.assertRaises(Exception) as context:
-            StringCalculator.Add("//;\n1;2;-3")
+            self.assertRaises(Exception, StringCalculator.Add, "//;\n1;2;-3")
 
-        msg = str(context.exception)
-        wrong_values = context.exception.wrong_data
+            with self.assertRaises(Exception) as context:
+                StringCalculator.Add("//;\n1;2;-3")
 
-        self.assertTrue("negatives not allowed" in msg)
-        self.assertTrue(-3 in wrong_values)
+            msg = str(context.exception)
+            wrong_values = context.exception.wrong_data
+
+            self.assertTrue("negatives not allowed" in msg)
+            self.assertTrue(-3 in wrong_values)
 
     def test_exception_for_negative_numbers_list(self):
-        wrong_command = "//;\n1;2;-3;-4;-5"
+        with self._mocky_ret() as mc:
+            mc.parse_input.return_value = [1, 2, -3, -4, -5]
 
-        with self.assertRaises(Exception) as context:
-            StringCalculator.Add(wrong_command)
+            wrong_command = "//;\n1;2;-3;-4;-5"
 
-        msg = str(context.exception)
-        wrong_values = context.exception.wrong_data
+            with self.assertRaises(Exception) as context:
+                StringCalculator.Add(wrong_command)
 
-        self.assertTrue("negatives not allowed" in msg)
-        wrong_numbers = [-3, -4, -5]
-        for value in wrong_numbers:
-            self.assertTrue(value in wrong_values)
+            msg = str(context.exception)
+            wrong_values = context.exception.wrong_data
+
+            self.assertTrue("negatives not allowed" in msg)
+            wrong_numbers = [-3, -4, -5]
+            for value in wrong_numbers:
+                self.assertTrue(value in wrong_values)
 
     def test_big_numbers_ignore(self):
-        v = StringCalculator.Add("1,2, 3, 4, 1500, 2000, 1001   ")
-        self.assertEqual(v, 10)
+        with self._mocky_ret() as mc:
+            mc.parse_input.return_value = [1, 2, 3, 4, 1500, 2000, 1001]
 
-    def test_custom_delimiters(self):
-        v = StringCalculator.Add("//[***]\n1***2***3")
-        self.assertEqual(v, 6)
-
-    def test_multiple_delimiters(self):
-        v = StringCalculator.Add("//[*][%]\n1*2%3")
-        self.assertEqual(v, 6)
-
-    def test_multiple_long_delimiters(self):
-        v = StringCalculator.Add("//[&&*][%%@]\n1&&*2%%@3")
-        self.assertEqual(v, 6)
+            v = StringCalculator.Add("1,2, 3, 4, 1500, 2000, 1001   ")
+            self.assertEqual(v, 10)
 
 
 if __name__ == "__main__":
