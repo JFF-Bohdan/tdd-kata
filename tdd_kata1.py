@@ -156,26 +156,32 @@ class TestStringCalculator(unittest.TestCase):
             mc.parse_input.return_value = []
             self.assertEqual(StringCalculator.Add(""), 0)
 
+            mc.parse_input.assert_called_once_with("")
+
     def test_one_value_sum(self):
         with self._mocky_ret() as mc:
             mc.parse_input.return_value = [1]
             self.assertEqual(StringCalculator.Add("1"), 1)
+
+            mc.parse_input.assert_called_once_with("1")
 
     def test_simple_input(self):
         with self._mocky_ret() as mc:
             mc.parse_input.return_value = [1, 2]
             self.assertEqual(StringCalculator.Add("1,2"), 3)
 
+            mc.parse_input.assert_called_once_with("1,2")
+
     def test_unknown_amount_of_numbers(self):
         with self._mocky_ret() as mc:
             mc.parse_input.return_value = [1, 2, 3, 4]
             self.assertEqual(StringCalculator.Add("1,2, 3, 4   "), 10)
 
+            mc.parse_input.assert_called_once_with("1,2, 3, 4   ")
+
     def test_exceptions_for_negative_number(self):
         with self._mocky_ret() as mc:
             mc.parse_input.return_value = [1, 2, -3]
-
-            self.assertRaises(Exception, StringCalculator.Add, "//;\n1;2;-3")
 
             with self.assertRaises(Exception) as context:
                 StringCalculator.Add("//;\n1;2;-3")
@@ -185,6 +191,8 @@ class TestStringCalculator(unittest.TestCase):
 
             self.assertTrue("negatives not allowed" in msg)
             self.assertTrue(-3 in wrong_values)
+
+            mc.parse_input.assert_called_once_with("//;\n1;2;-3")
 
     def test_exception_for_negative_numbers_list(self):
         with self._mocky_ret() as mc:
@@ -203,12 +211,16 @@ class TestStringCalculator(unittest.TestCase):
             for value in wrong_numbers:
                 self.assertTrue(value in wrong_values)
 
+            mc.parse_input.assert_called_once_with(wrong_command)
+
     def test_big_numbers_ignore(self):
         with self._mocky_ret() as mc:
             mc.parse_input.return_value = [1, 2, 3, 4, 1500, 2000, 1001]
 
             v = StringCalculator.Add("1,2, 3, 4, 1500, 2000, 1001   ")
             self.assertEqual(v, 10)
+
+            mc.parse_input.assert_called_once_with("1,2, 3, 4, 1500, 2000, 1001   ")
 
 
 if __name__ == "__main__":
