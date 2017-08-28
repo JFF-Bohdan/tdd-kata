@@ -85,6 +85,6 @@ def test_big_numbers_ignore(mocker):
 
 
 def mocky_ret(mocker, mocked_return_value):
-    res =  mocker.patch("work_classes.string_calculator.StringCalculatorInputParser.parse_input")
+    res = mocker.patch("work_classes.string_calculator.StringCalculatorInputParser.parse_input")
     res.return_value = mocked_return_value
     return res

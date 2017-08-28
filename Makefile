@@ -33,15 +33,15 @@ coverage:
 	
 .PHONY: lint
 lint:
-	$(PYFLAKE8)
+	@$(PYFLAKE8)
 	
 .PHONY: flake8
 flake8:
-	$(PYFLAKE8)
+	@$(MAKE) lint
 
 .PHONY: clean
 clean:
-	if exist $(ENV) rd $(ENV) /q /s
-	if exist .coverage del .coverage
-	if exist htmlcov rd htmlcov /q /s
-	del /S *.pyc
+	@if exist $(ENV) rd $(ENV) /q /s
+	@if exist .coverage del .coverage
+	@if exist htmlcov rd htmlcov /q /s
+	@del /S *.pyc
