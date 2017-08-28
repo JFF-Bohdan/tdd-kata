@@ -74,7 +74,7 @@ class StringCalculator:
         pass
 
     @staticmethod
-    def Add(commands):
+    def add(commands):
         """
         Calculates sum of tasks with delimiters according to rules
         :param commands: string with delimiters and tasks
