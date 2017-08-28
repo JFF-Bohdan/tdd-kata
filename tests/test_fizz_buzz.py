@@ -1,5 +1,7 @@
 import random
 
+import pytest
+
 from work_classes.fizz_buzz import FizzBuzzImplementation
 
 
@@ -26,3 +28,13 @@ def test_returns_ints_converted_to_strings_when_not_3_and_not_5_multipliers():
     result = FizzBuzzImplementation.play(int_value)
 
     assert result == str(int_value)
+
+
+def test_raises_exception_when_got_negative_value():
+    with pytest.raises(Exception):
+        FizzBuzzImplementation.play(-10)
+
+
+def test_raises_exception_when_got_value_more_than_100():
+    with pytest.raises(Exception):
+        FizzBuzzImplementation.play(101)

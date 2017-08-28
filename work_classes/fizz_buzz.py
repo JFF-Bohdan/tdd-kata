@@ -4,6 +4,9 @@ class FizzBuzzImplementation(object):
 
     @staticmethod
     def play(value):
+        if value < 0 or value > 100:
+            raise Exception("Unsupported value")
+
         res = None
 
         if value % 3 == 0:
