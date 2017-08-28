@@ -38,3 +38,12 @@ def test_raises_exception_when_got_negative_value():
 def test_raises_exception_when_got_value_more_than_100():
     with pytest.raises(Exception):
         FizzBuzzImplementation.play(101)
+
+
+def test_all_game_is_valud():
+    res = FizzBuzzImplementation.game()
+
+    assert len(res) == 100
+
+    for index, item in enumerate(res):
+        assert FizzBuzzImplementation.play(index+1) == item

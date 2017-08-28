@@ -16,3 +16,11 @@ class FizzBuzzImplementation(object):
             res = res + "buzz" if res is not None else "buzz"
 
         return str(value) if res is None else res
+
+    @staticmethod
+    def game():
+        res = []
+        for i in range(1, 101):
+            res.append(FizzBuzzImplementation.play(i))
+
+        return res
