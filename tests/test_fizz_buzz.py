@@ -46,4 +46,4 @@ def test_all_game_is_valud():
     assert len(res) == 100
 
     for index, item in enumerate(res):
-        assert FizzBuzzImplementation.play(index+1) == item
+        assert FizzBuzzImplementation.play(index + 1) == item

@@ -1,5 +1,5 @@
 [flake8]
-exclude = .idea, __pycache__, log, __init__.py, env
+exclude = .idea, __pycache__, log, __init__.py, env, test.py
 max-line-length = 150
 max-complexity = 10
 filename = *.py
